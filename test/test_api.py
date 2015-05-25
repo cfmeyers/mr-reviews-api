@@ -1,5 +1,5 @@
 import unittest, json
-from app import app
+from app import app#, Review
 
 class TestCase(unittest.TestCase):
 
@@ -15,3 +15,8 @@ class TestCase(unittest.TestCase):
             response = c.get('/')
             data = json.loads(response.data)
             self.assertSequenceEqual( {'success':'hello world'}, data )
+
+    # def test_review_to_dict_method(self):
+    #     review_info = {'item_author':'Jorge Luis Borges', 'item_title':'Labrynthes'}
+    #     review1 = Review(**review_info)
+    #     self.assertDictEqual(review_info, review1.to_dict)
