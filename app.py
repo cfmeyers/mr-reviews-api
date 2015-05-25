@@ -1,6 +1,8 @@
-from flask import Flask, jsonify
+from flask import Flask, jsonify, request
 from flask.ext.sqlalchemy import SQLAlchemy
 from sqlalchemy.orm import relationship
+from sqlalchemy import func
+from ipdb import set_trace
 
 app = Flask(__name__)
 db = SQLAlchemy(app)
@@ -35,7 +37,7 @@ class Review(db.Model):
         return {'id': self.id, 'author': self.author, 
                 'item_title': self.item_title, 'item_author': self.item_author,
                 'item_asin': self.item_asin, 'item_image_url': self.item_image_url,
-                'post_url': self.post_url, 'date': self.date, 'genres': self.genres }
+                'post_url': self.post_url, 'date': self.date, 'genres': [g.name for g in self.genres] }
 
 
 ####################################################################
@@ -55,4 +57,28 @@ class Genre(db.Model):
 @app.route('/')
 def hello_world():
     return jsonify({'success':'hello world'})
+
+
+@app.route('/api/v1/reviews')
+def get_reviews():
+    author = request.args.get('author') or ''
+    title = request.args.get('title') or ''
+    genre_name = request.args.get('genre') or ''
+
+    if genre_name:
+        genre = db.session.query(Genre).filter(Genre.name==genre_name)
+
+    query = (db.session.query(Review)
+            .filter(Review.item_author.ilike('%'+author+'%'))
+            .filter(Review.item_title.ilike('%'+title+'%'))
+            )
+    if genre_name:
+        query = query.filter(Review.genres.any(Genre.name==genre_name))
+
+    results = [result.to_dict() for result in query]
+    return jsonify({'results':results})
+
+
+
+
 
