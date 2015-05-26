@@ -8,11 +8,10 @@ engine = create_engine('sqlite:///mr_posts.db')
 Base.metadata.bind = engine
 DBSession = sessionmaker(bind=engine)
 session = DBSession()
-genres = session.query(Genre).all()
+# genres = session.query(Genre).all()
 books = session.query(Book).all()
 
 from app import app, db, Review
-from app import Genre as DeployedGenre
 
 for book in books:
     asin = re.search(r"[\dA-Z]{10}", book.link.href).group()
@@ -25,15 +24,10 @@ for book in books:
             author=post_author,
             post_url=post_url,
             date=book.link.post.date)
-    for genre in book.genres:
-        deployed_genre = db.session.query(DeployedGenre).filter(DeployedGenre.name==genre.name).first()
-        if not deployed_genre:
-            deployed_genre = DeployedGenre(genre.name)
-            db.session.add(deployed_genre)
-            print deployed_genre.name
-        else:
-            print "FOUND"*30
-        new_review.genres.append(deployed_genre)
+    new_review.genres = ' '.join([genre.name for genre in book.genres])
+    # for genre in book.genres:
+        # if genre.name:
+            # new_review.genres += genre.name + ' '
     db.session.add(new_review)
 
 db.session.commit()
