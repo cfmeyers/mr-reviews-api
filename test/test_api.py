@@ -1,5 +1,5 @@
 import unittest, json
-from app import app, db, Review, Genre
+from app import app, db, Review
 from ipdb import set_trace
 
 
@@ -13,10 +13,10 @@ class TestCase(unittest.TestCase):
 
         #fixtures
         self.review_fixtures = {
-                'labrynthes' : {'item_author':'Jorge Luis Borges', 'item_title':'Labrynthes', 'genres':[]},
-                'ficciones' : {'item_author':'Jorge Luis Borges', 'item_title':'Ficciones','genres':[]}, 
-                'aleph' : {'item_author':'Jorge Luis Borges', 'item_title':'El Aleph','genres':[]},
-                'father brown' : {'item_author':'G.K. Chesterton', 'item_title':'Father Brown', 'genres':[]}
+                'labrynthes' : {'item_author':'Jorge Luis Borges', 'item_title':'Labrynthes', 'genres':''},
+                'ficciones' : {'item_author':'Jorge Luis Borges', 'item_title':'Ficciones','genres':''}, 
+                'aleph' : {'item_author':'Jorge Luis Borges', 'item_title':'El Aleph','genres':''},
+                'father brown' : {'item_author':'G.K. Chesterton', 'item_title':'Father Brown', 'genres':''}
                 }
 
     def tearDown(self):
@@ -87,16 +87,13 @@ class TestCase(unittest.TestCase):
             self.assertItemsEqual( [d['item_title'] for d in all_books], [d['item_title'] for d in data['results']] )
 
     def test_reviews_genre_param(self):
-        borges_books = [self.review_fixtures['labrynthes'], self.review_fixtures['ficciones'], self.review_fixtures['aleph']]
-        mystery = Genre(name='Mystery')
-        wierd = Genre(name='Wierd')
-        db.session.add_all([mystery, wierd])
+
         for key, book in self.review_fixtures.iteritems():
             book_rev = Review(**book)
             if book_rev.item_author == 'Jorge Luis Borges':
-                book_rev.genres.append(wierd)
+                book_rev.genres += 'Wierd'
             else:
-                book_rev.genres.append(mystery)
+                book_rev.genres += 'Mystery'
             db.session.add(book_rev)
 
         db.session.commit()
@@ -104,6 +101,7 @@ class TestCase(unittest.TestCase):
         with self.app as c:
             response = c.get('/api/v1/reviews?genre=Mystery')
             data = json.loads(response.data)
+            gk = db.session.query(Review)[3]
             self.assertItemsEqual( [self.review_fixtures['father brown']['item_title']], [d['item_title'] for d in data['results']] )
 
 
