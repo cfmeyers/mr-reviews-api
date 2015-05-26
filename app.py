@@ -31,8 +31,8 @@ class Review(db.Model):
     item_image_url = db.Column(db.String(250))
     post_url = db.Column(db.String(250))
     date = db.Column(db.Date)
-    genre = db.Column(db.Text)
-    # genres = relationship('Genre', secondary=association_table, backref='reviews')
+    # genre = db.Column(db.Text)
+    genres = relationship('Genre', secondary=association_table, backref='reviews')
 
     def to_dict(self):
         return {'id': self.id, 'author': self.author, 
