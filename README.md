@@ -3,7 +3,7 @@ MR-Reviews-API is a JSON API for reviews of books and other media on [Marginal R
 
 For details on how it was built, check out [this blog post](http://blog.cfmeyers.com/2015/05/20/tdding-a-flask-api.html).
 
-##Routes
+##Routes (Examples)
 
 -  [https://marginal-review-api.herokuapp.com/api/v1/reviews?author=Borges](https://marginal-review-api.herokuapp.com/api/v1/reviews?author=Borges)
 
