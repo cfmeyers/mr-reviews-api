@@ -24,9 +24,9 @@ class Review(db.Model):
 
     __tablename__ = 'review'
     id = db.Column(db.Integer, primary_key=True)
-    author = db.Column(db.String(250))
-    item_title = db.Column(db.String(250))
-    item_author = db.Column(db.String(250))
+    author = db.Column(db.String(250), index=True)
+    item_title = db.Column(db.String(250), index=True)
+    item_author = db.Column(db.String(250), index=True)
     item_asin = db.Column(db.String(50))
     item_image_url = db.Column(db.String(250))
     post_url = db.Column(db.String(250))
@@ -45,7 +45,7 @@ class Genre(db.Model):
 
     __tablename__ = 'genre'
     id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String(120))
+    name = db.Column(db.String(120), index=True)
 
     def __init__(self, name):
         self.name = name
