@@ -31,13 +31,14 @@ class Review(db.Model):
     item_image_url = db.Column(db.String(250))
     post_url = db.Column(db.String(250))
     date = db.Column(db.Date)
-    genres = relationship('Genre', secondary=association_table, backref='reviews')
+    genre = db.Column(db.Text)
+    # genres = relationship('Genre', secondary=association_table, backref='reviews')
 
     def to_dict(self):
         return {'id': self.id, 'author': self.author, 
                 'item_title': self.item_title, 'item_author': self.item_author,
                 'item_asin': self.item_asin, 'item_image_url': self.item_image_url,
-                'post_url': self.post_url, 'date': self.date, 'genres': [g.name for g in self.genres] }
+                'post_url': self.post_url, 'date': self.date.__str__(), 'genres': [g.name for g in self.genres] }
 
 
 ####################################################################
@@ -59,14 +60,11 @@ def hello_world():
     return jsonify({'success':'hello world'})
 
 
-@app.route('/api/v1/reviews')
+@app.route('/api/v1/reviews', methods=['GET'])
 def get_reviews():
     author = request.args.get('author') or ''
     title = request.args.get('title') or ''
     genre_name = request.args.get('genre') or ''
-
-    if genre_name:
-        genre = db.session.query(Genre).filter(Genre.name==genre_name)
 
     query = (db.session.query(Review)
             .filter(Review.item_author.ilike('%'+author+'%'))
@@ -76,7 +74,12 @@ def get_reviews():
         query = query.filter(Review.genres.any(Genre.name==genre_name))
 
     results = [result.to_dict() for result in query]
+    # set_trace()
     return jsonify({'results':results})
+    # return jsonify({'results':'beeboo'})
+
+if __name__ == '__main__':
+    app.run()
 
 
 
