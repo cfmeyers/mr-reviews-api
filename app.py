@@ -1,19 +1,14 @@
 from flask import Flask, jsonify, request
 from flask.ext.sqlalchemy import SQLAlchemy
-# from sqlalchemy.orm import relationship
+from flask.ext.cors import CORS
 from sqlalchemy import func
 from ipdb import set_trace
 
 app = Flask(__name__)
+cors = CORS(app)
 db = SQLAlchemy(app)
 app.config.from_object('config')
 
-####################################################################
-# association_table = db.Table('association', db.Model.metadata,
-#     db.Column('review_id', db.Integer, db.ForeignKey('review.id')), #left
-#     db.Column('genre_id', db.Integer, db.ForeignKey('genre.id')) #right
-# )
-####################################################################
 
 
 class Review(db.Model):
@@ -32,7 +27,6 @@ class Review(db.Model):
     post_url = db.Column(db.String(250))
     date = db.Column(db.Date)
     genres = db.Column(db.Text)
-    # genres = relationship('Genre', secondary=association_table, backref='reviews')
 
     def to_dict(self):
         return {'id': self.id, 'author': self.author, 
@@ -40,19 +34,6 @@ class Review(db.Model):
                 'item_asin': self.item_asin, 'item_image_url': self.item_image_url,
                 'post_url': self.post_url, 'date': self.date.__str__(), 'genres': self.genres }
 
-
-####################################################################
-# class Genre(db.Model):
-
-#     __tablename__ = 'genre'
-#     id = db.Column(db.Integer, primary_key=True)
-#     name = db.Column(db.String(120), index=True)
-
-#     def __init__(self, name):
-#         self.name = name
-
-
-####################################################################
 
 
 @app.route('/')
